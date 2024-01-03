@@ -17,17 +17,16 @@ export async function action({ request }) {
   }
 
   const data = await request.formData();
-  const authData = {
-    email: data.get('email'),
-    password: data.get('password'),
-  };
 
-  const response = await fetch('http://localhost:8080/' + mode, {
+  let param = 'username=' + encodeURIComponent(data.get('email')) + '&password=' + encodeURIComponent(data.get('password'));
+  console.log(param);
+
+  const response = await fetch('http://localhost:8086/api/v1/ecommerce/' + mode, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
     },
-    body: JSON.stringify(authData),
+    body: decodeURIComponent('username=' + encodeURIComponent(data.get('email')) + '&password=' + encodeURIComponent(data.get('password'))),
   });
 
   if (response.status === 422 || response.status === 401) {
