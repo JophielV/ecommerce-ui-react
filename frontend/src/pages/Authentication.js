@@ -21,13 +21,16 @@ export async function action({ request }) {
   let param = 'username=' + encodeURIComponent(data.get('email')) + '&password=' + encodeURIComponent(data.get('password'));
   console.log(param);
 
-  const response = await fetch('http://localhost:8086/api/v1/ecommerce/' + mode, {
+  const response = await fetch('http://172.25.0.5:8080/api/v1/ecommerce/' + mode, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
     },
     body: decodeURIComponent('username=' + encodeURIComponent(data.get('email')) + '&password=' + encodeURIComponent(data.get('password'))),
   });
+
+  console.log('response: ');
+  console.log(response);
 
   if (response.status === 422 || response.status === 401) {
     return response;
@@ -38,6 +41,9 @@ export async function action({ request }) {
   }
 
   const resData = await response.json();
+  console.log('resData: ');
+  console.log(resData);
+
   const token = resData.token;
 
   localStorage.setItem('token', token);

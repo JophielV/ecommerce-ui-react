@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  react:
+    build:
+      context: .
+      dockerfile: react.dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - my-proxy-net
+
+networks:
+  my-proxy-net:
+    external:
+      name: custom_network
