@@ -2,11 +2,11 @@ FROM node:18-slim
 
 WORKDIR /app
 
-COPY ./frontend/package.json /app
+COPY ./package.json /app
 
 RUN npm install
 
-COPY ./frontend /app
+COPY . /app
 
 EXPOSE 3000
 
