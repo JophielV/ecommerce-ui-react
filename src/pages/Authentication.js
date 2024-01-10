@@ -21,7 +21,7 @@ export async function action({ request }) {
   let param = 'username=' + encodeURIComponent(data.get('email')) + '&password=' + encodeURIComponent(data.get('password'));
   console.log(param);
 
-  const response = await fetch('http://localhost:8080/api/v1/ecommerce/' + mode, {
+  const response = await fetch('http://ecommerce-lb-1041664354.ap-southeast-1.elb.amazonaws.com/api/v1/ecommerce/' + mode, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
