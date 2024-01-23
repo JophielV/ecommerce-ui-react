@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecommerce-ui-service
+spec:
+  selector:
+    app: ecommerce-ui-kb
+  ports:
+    - protocol: 'TCP'
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecommerce-ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecommerce-ui-kb
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: ecommerce-ui-kb
+        tier: frontend
+    spec:
+      containers:
+        - name: ecommerce-ui-kb
+          image: jophielv/ecommerce-ui-prod-kub
+          env:
+            - name: APP_ADDRESS
+              value: "ecommerce-app-service.default"
