@@ -31,6 +31,3 @@ spec:
       containers:
         - name: ecommerce-ui-kb
           image: jophielv/ecommerce-ui-prod-kub
-          env:
-            - name: APP_ADDRESS
-              value: "ecommerce-app-service.default"
