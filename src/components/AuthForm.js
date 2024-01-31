@@ -19,7 +19,7 @@ function AuthForm() {
   return (
     <>
       <Form method="post" className={classes.form}>
-        <h1>{isLogin ? 'Log in9' : 'Create a new user'}</h1>
+        <h1>{isLogin ? 'Log in14' : 'Create a new user'}</h1>
         {data && data.errors && (
           <ul>
             {Object.values(data.errors).map((err) => (
