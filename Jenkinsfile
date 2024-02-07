@@ -13,6 +13,7 @@ pipeline {
         def dockerImage = ""
         def dockerImageLatest = ""
         def dockerRegistry = "https://registry.hub.docker.com"
+        def dockerRegistryNoProto = "registry.hub.docker.com"
         def dockerKubectlAws = "jophielv/kubectl-aws"
 
         def awsEksEcommerceDeployment = "ecommerce-ui-deployment"
@@ -60,6 +61,14 @@ pipeline {
             steps {
                 script {
                     sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
+                }
+            }
+        }
+        stage("Post - Cleanup") {
+            steps {
+                script {
+                    sh "docker rmi ${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
+                    sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
                 }
             }
         }
