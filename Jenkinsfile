@@ -69,6 +69,9 @@ pipeline {
                 script {
                     sh "docker rmi ${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
                     sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
+                    sh "docker rmi ${dockerRepoName}:latest"
+                    sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
+                    sh "docker image prune"
                 }
             }
         }
