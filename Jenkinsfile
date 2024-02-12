@@ -24,7 +24,7 @@ pipeline {
     }
 
     parameters {
-        choice(choices:["${localEnv}", ${stagingEnv}],
+        choice(choices:["local", "staging"],
                 description: "Which environment to deploy?",
                 name: "deployEnv")
     }
