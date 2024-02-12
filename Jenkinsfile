@@ -18,6 +18,15 @@ pipeline {
 
         def awsEksEcommerceDeployment = "ecommerce-ui-deployment"
         def kubectlConfigPath = "/home/joph/.kube/config"
+
+        def localEnv = "local"
+        def stagingEnv = "staging"
+    }
+
+    parameters {
+        choice(choices:[${localEnv}, ${stagingEnv}],
+                description: "Which environment to deploy?",
+                name: "deployEnv")
     }
 
 
@@ -46,21 +55,31 @@ pipeline {
                 unstash 'scm'
                 script {
                     sh "echo ${dockerRepoName}:$BUILD_NUMBER"
+
                     dockerImage = docker.build("${dockerRepoName}:${majorVersion}.$BUILD_NUMBER", "-f ${dockerFile} .")
-                    docker.withRegistry("${dockerRegistry}", dockerCredential) {
-                        dockerImage.push()
+                    if (params.deployEnv == ${stagingEnv}) {
+                        docker.withRegistry("${dockerRegistry}", dockerCredential) {
+                            dockerImage.push()
+                        }
                     }
+
                     dockerImageLatest = docker.build("${dockerRepoName}:latest", "-f ${dockerFile} .")
-                    docker.withRegistry("${dockerRegistry}", dockerCredential) {
-                        dockerImageLatest.push()
+                    if (params.deployEnv == ${stagingEnv}) {
+                        docker.withRegistry("${dockerRegistry}", dockerCredential) {
+                            dockerImageLatest.push()
+                        }
                     }
                 }
             }
         }
-        stage("Kubernetes - EKS") {
+        stage("Kubernetes") {
             steps {
                 script {
-                    sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
+                    if (params.deployEnv == ${stagingEnv}) {
+                        sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
+                    } else if(params.deployEnv == ${localEnv}) {
+
+                    }
                 }
             }
         }
@@ -71,7 +90,7 @@ pipeline {
                     sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
                     sh "docker rmi ${dockerRepoName}:latest"
                     sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
-                    sh "docker image prune"
+                    sh "y | docker image prune"
                 }
             }
         }
