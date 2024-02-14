@@ -18,6 +18,7 @@ pipeline {
 
         def awsEksEcommerceDeployment = "ecommerce-ui-deployment"
         def kubectlConfigPath = "/home/joph/.kube/config"
+        def kubectlDeploymentFileName = "deployment.yaml"
         def minikubeClientCrtPath = "/home/joph/.minikube/profiles/minikube/client.crt"
         def minikubeClientKeyPath = "/home/joph/.minikube/profiles/minikube/client.key"
         def minikubeCaCrtPath = "/home/joph/.minikube/ca.crt"
@@ -89,8 +90,7 @@ pipeline {
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
-                            ls
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} apply -f ./deployment.yaml
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v ${kubectlDeploymentFileName}:/${kubectlDeploymentFileName}  ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
                     }
