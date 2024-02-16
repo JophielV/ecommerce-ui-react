@@ -54,7 +54,7 @@ pipeline {
                 }
             }
         }
-        stage("Docker") {
+        /*stage("Docker") {
             steps {
                 unstash 'scm'
                 script {
@@ -75,7 +75,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage("Kubernetes") {
             steps {
                 dir("/tmp/jenkins_tmp") {
@@ -96,7 +96,7 @@ pipeline {
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deployments
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/deployment.yaml:/deployment.yaml ${dockerKubectlAws} get deployments
                             fi
                         '''
                     }
