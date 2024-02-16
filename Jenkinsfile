@@ -91,8 +91,8 @@ pipeline {
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh '''
                            cat deployment.yaml
-                           mkdir -p /home/joph/Documents/jenkins_tmp
-                           cp ./deployment.yaml /home/joph/Documents/jenkins_tmp
+                           mkdir -p /tmp/jenkins_test
+                           cp ./deployment.yaml /tmp/jenkins_test
                         '''
 
 
