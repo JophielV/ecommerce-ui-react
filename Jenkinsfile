@@ -45,7 +45,7 @@ pipeline {
                 git url: "${projectRepository}", branch: "${env.BRANCH_NAME}"
                 stash name:'scm', includes:'*'
                 stash name:'yaml', includes:'deployment.yaml'
-                dir('/tmp/${env.JOB_BASE_NAME}-$BUILD_NUMBER'){
+                dir('/tmp/jenkins_test'){
                     unstash 'yaml'
                 }
             }
