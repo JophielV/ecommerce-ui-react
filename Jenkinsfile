@@ -90,6 +90,7 @@ pipeline {
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh "whoami"
                         sh '''
+                           mkdir /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            cp ./deployment.yaml /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                         '''
