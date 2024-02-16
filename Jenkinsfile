@@ -78,12 +78,6 @@ pipeline {
         }*/
         stage("Kubernetes") {
             steps {
-                fileOperations([fileCopyOperation(
-                        excludes: '',
-                        flattenFiles: false,
-                        includes: '/var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/*.yaml',
-                        targetLocation: "/tmp/test_jen"
-                )])
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
@@ -93,6 +87,17 @@ pipeline {
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh '''
+
+File sourceFolder = new File("/var/jenkins_home/workspace/merce-ui-react_build_and_jenkins");
+                    File  destinationFolder = new File("/tmp/test_jen");                                                   
+                    File[] listOfFiles = sourceFolder.listFiles();
+                    echo "Files Total: " + listOfFiles.length;  
+                    for (File file : listOfFiles) {
+                        if (file.isFile()) {
+                            echo file.getName()                                                                
+                            Files.copy(Paths.get(file.path), Paths.get("/tmp/test_jen"));                                   
+                        }
+                    }
                            
                            
                         '''
