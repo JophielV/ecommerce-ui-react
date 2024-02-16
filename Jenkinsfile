@@ -93,8 +93,7 @@ File sourceFolder = new File("/var/jenkins_home/workspace/merce-ui-react_build_a
                     File[] listOfFiles = sourceFolder.listFiles();
                     echo "Files Total: " + listOfFiles.length;  
                     for (File file : listOfFiles) {
-                        if (file.isFile()) {
-                            echo file.getName()                                                                
+                        if (file.isFile()) {                                                               
                             Files.copy(Paths.get(file.path), Paths.get("/tmp/test_jen"));                                   
                         }
                     }
