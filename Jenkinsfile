@@ -87,19 +87,10 @@ pipeline {
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh '''
-                           
+                           cp ./deployment.yaml /home/joph/Documents/
                            
                         '''
 
-                        File sourceFolder = new File("/var/jenkins_home/workspace/merce-ui-react_build_and_jenkins");
-                        File[] listOfFiles = sourceFolder.listFiles();
-                        echo "Files Total: " + listOfFiles.length;
-                        for (File file : listOfFiles) {
-                            if (file.isFile()) {
-                                echo file.getName()
-                                Files.copy(Paths.get(file.path), Paths.get("/tmp/test_jen"));
-                            }
-                        }
 
 
                         /*sh '''
