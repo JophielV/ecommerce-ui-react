@@ -44,9 +44,9 @@ pipeline {
             steps {
                 git url: "${projectRepository}", branch: "${env.BRANCH_NAME}"
                 stash name:'scm', includes:'*'
-                stash name:'yaml', includes:'deployment.yaml'
+                stash name:'yaml', includes:'*'
                 dir('/tmp/jenkins_test'){
-                    unstash 'yaml'
+                    unstash 'scm'
                 }
             }
         }
