@@ -78,7 +78,9 @@ pipeline {
         }
         stage("Kubernetes") {
             steps {
-                unstash 'scm'
+                dir("/tmp/jenkins_tmp") {
+                    unstash "scm"
+                }
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
@@ -87,10 +89,6 @@ pipeline {
                         sh "pwd"
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
-                        sh '''
-                           mkdir /tmp/jenkins-tmp
-                           cp ./deployment.yaml /tmp/jenkins-tmp
-                        '''
 
 
                         sh '''
@@ -98,7 +96,7 @@ pipeline {
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $(pwd)/${kubectlDeploymentFileName}:/${kubectlDeploymentFileName}  ${dockerKubectlAws} get deployments
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /tmp/jenkins_tmp/${kubectlDeploymentFileName}:/${kubectlDeploymentFileName}  ${dockerKubectlAws} get deployments
                             fi
                         '''
                     }
