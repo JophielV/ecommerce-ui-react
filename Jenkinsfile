@@ -92,7 +92,7 @@ pipeline {
                         sh '''
                            mkdir -p /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            cp ./deployment.yaml /tmp/${tmpFolder}/${kubectlDeploymentFileName}
-                           docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${tmpFolder}/${kubectlDeploymentFileName}
+                           docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/
                         '''
 
                         sh '''
