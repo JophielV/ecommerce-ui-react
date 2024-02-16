@@ -81,7 +81,7 @@ pipeline {
                 fileOperations([fileCopyOperation(
                         excludes: '',
                         flattenFiles: false,
-                        includes: '/var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/**',
+                        includes: '/var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/*',
                         targetLocation: "/tmp/test_jen"
                 )])
                 script {
