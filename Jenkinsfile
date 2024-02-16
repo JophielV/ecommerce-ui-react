@@ -25,6 +25,8 @@ pipeline {
 
         def localEnv = "local"
         def stagingEnv = "staging"
+
+        def tmpFolder = "test_$BUILD_NUMBER"
     }
 
     parameters {
@@ -88,6 +90,11 @@ pipeline {
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh "whoami"
                         sh '''
+                           cp ./deployment.yaml /tmp/
+                           docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${tmpFolder}/${kubectlDeploymentFileName}
+                        '''
+
+                        sh '''
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
@@ -95,7 +102,7 @@ pipeline {
                             cd /tmp
                             pwd
                             ls
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} apply -f /tmp/deployment.yaml
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /tmp/${tmpFolder}/${kubectlDeploymentFileName}:${kubectlDeploymentFileName} ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
 
