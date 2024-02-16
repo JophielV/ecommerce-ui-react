@@ -86,21 +86,20 @@ pipeline {
                         sh "pwd"
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
+                        sh "whoami"
                         sh '''
-                           cp ./deployment.yaml /tmp/
-                           
+                           cp ./deployment.yaml /tmp/ 
                         '''
 
 
-
-                        /*sh '''
+                        sh '''
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f deployment.yaml
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /tmp/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f deployment.yaml
                             fi
-                        '''*/
+                        '''
                     }
                 }
             }
