@@ -78,9 +78,12 @@ pipeline {
         }*/
         stage("Kubernetes") {
             steps {
-                dir("/tmp/jenkins_tmp") {
-                    unstash "scm"
-                }
+                fileOperations([fileCopyOperation(
+                        excludes: '',
+                        flattenFiles: false,
+                        includes: '$(pwd)/',
+                        targetLocation: "/tmp/test_jen"
+                )])
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
@@ -90,9 +93,8 @@ pipeline {
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh '''
-                           cat deployment.yaml
-                           mkdir -p /opt/jenkins_test
-                           cp ./deployment.yaml /opt/jenkins_test
+                           
+                           
                         '''
 
 
