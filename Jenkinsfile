@@ -44,10 +44,6 @@ pipeline {
             steps {
                 git url: "${projectRepository}", branch: "${env.BRANCH_NAME}"
                 stash name:'scm', includes:'*'
-                stash name:'yaml', includes:'*'
-                dir('/tmp/jenkins_test'){
-                    unstash 'scm'
-                }
             }
         }
         stage('Initialize Docker') {
@@ -91,6 +87,12 @@ pipeline {
                         sh "pwd"
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
+                        sh '''
+                           mkdir /tmp/jenkins-tmp
+                           cp ./deployment.yaml /tmp/jenkins-tmp
+                        '''
+
+
                         sh '''
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
