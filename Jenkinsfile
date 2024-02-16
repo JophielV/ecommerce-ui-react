@@ -87,7 +87,7 @@ pipeline {
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh '''
-                           cp ./deployment.yaml /home/joph/Documents/
+                           cp ./deployment.yaml /opt/
                            
                         '''
 
