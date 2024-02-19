@@ -125,7 +125,7 @@ echo $modifiedDir
                             echo "Performing command"
                             currDirectory=$(pwd)
                             size=${#currDirectory}
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/lib/docker/volumes/$(cut -c6-$size <<< $(pwd))/deployment.yaml:/deployment.yaml apply -f ${kubectlDeploymentFileName}
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/lib/docker/volumes/$(cut -c6-$size <<< $(pwd))/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
 
