@@ -93,7 +93,7 @@ pipeline {
                             echo "Performing command"
                             currDir=$(pwd)
                             size=${#currDir}
-                            contextDir=/var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))
+                            contextDir=$(/var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd)))
                             
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $(contextDir)/${kubectlDeploymentFileName}:/${kubectlDeploymentFileName} ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
