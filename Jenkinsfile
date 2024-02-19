@@ -91,6 +91,7 @@ pipeline {
                         sh "whoami"
 
                         sh '''
+                            #!/bin/bash
                             echo "Performing command"
                             currDirectory=$(pwd)
                             size=${#currDirectory}
