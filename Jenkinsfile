@@ -89,7 +89,7 @@ pipeline {
                         sh "ls"
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh "whoami"
-                        sh '''
+                        /*sh '''
                            mkdir -p /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            cp ./deployment.yaml /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${kubectlDeploymentFileName}
@@ -103,9 +103,9 @@ pipeline {
                             cd /tmp
                             pwd
                             ls
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /tmp/${tmpFolder}/${kubectlDeploymentFileName}:${kubectlDeploymentFileName} ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/jenkins_home:/var/jenkins_home ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
-                        '''
+                        '''*/
 
 
 
