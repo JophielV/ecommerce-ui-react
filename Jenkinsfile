@@ -103,7 +103,12 @@ pipeline {
                             cd /tmp
                             pwd
                             ls
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} apply -f /var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/${kubectlDeploymentFileName}
+                            currDirectory=$(pwd)
+                            size=${#currDirectory}
+                            currDir=$(cut -c6-$size <<< $(pwd))
+                            modifiedDir=/var/lib/docker/volumes/$currDir
+                            echo $modifiedDir
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $modifiedDir/deployment.yaml:/deployment.yaml apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
 
