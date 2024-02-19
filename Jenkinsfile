@@ -90,6 +90,15 @@ pipeline {
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh "whoami"
 
+                        sh '''
+                            echo "Performing command"
+                            currDirectory=$(pwd)
+                            size=${#currDirectory}
+                            currDir=$(cut -c6-$size <<< $(pwd))
+                            modifiedDir=/var/lib/docker/volumes/$currDir
+                            echo $modifiedDir
+                        '''
+
                         /*sh '''
 currDirectory=$(pwd)
 size=${#currDirectory}
@@ -113,15 +122,12 @@ echo $modifiedDir
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
+                            echo "Performing command"
                             currDirectory=$(pwd)
-size=${#currDirectory}
-
-awk \'
-BEGIN {
-currDir=substr(currDirectory, $size) 
-modifiedDir=/var/lib/docker/volumes/$currDir
-}\'
-echo $modifiedDir
+                            size=${#currDirectory}
+                            currDir=$(cut -c6-$size <<< $(pwd))
+                            modifiedDir=/var/lib/docker/volumes/$currDir
+                            echo $modifiedDir
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $(modifiedDir)/deployment.yaml:/deployment.yaml apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
