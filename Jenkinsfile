@@ -126,9 +126,9 @@ echo $modifiedDir
                             currDirectory=$(pwd)
                             size=${#currDirectory}
                             echo $size
-                            echo /var/lib/docker/volumes/$(cut -c6-$size <<< $(pwd))
+                            echo /var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))
                             
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/lib/docker/volumes/$(cut -c6-$size <<< $(pwd))/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
 
