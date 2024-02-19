@@ -94,7 +94,7 @@ pipeline {
                         echo "Performing command"
                         currDirectory=$(pwd)
                         size=${#currDirectory}
-                        currDir=$(cut -c6-$size <<< $(pwd))
+                        currDir=${currDirectory:0:size}
                         modifiedDir=/var/lib/docker/volumes/$currDir
                         echo $modifiedDir
                         '''
