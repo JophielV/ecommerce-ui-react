@@ -103,9 +103,8 @@ pipeline {
         stage("Post - Cleanup") {
             steps {
                 script {
-                    sh "docker rmi ${dockerRepoName}:latest"
-
                     if (params.deployEnv == "${stagingEnv}") {
+                        sh "docker rmi ${dockerRepoName}:latest"
                         sh "docker rmi ${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
