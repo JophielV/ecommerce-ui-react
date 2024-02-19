@@ -90,15 +90,14 @@ pipeline {
                         sh "readlink -f ${kubectlDeploymentFileName}"
                         sh "whoami"
 
-                        sh '''
-                            #!/bin/bash
+                        /*sh '''#!/bin/bash
                             echo "Performing command"
                             currDirectory=$(pwd)
                             size=${#currDirectory}
                             currDir=$(cut -c6-$size <<< $(pwd))
                             modifiedDir=/var/lib/docker/volumes/$currDir
                             echo $modifiedDir
-                        '''
+                        '''*/
 
                         /*sh '''
 currDirectory=$(pwd)
@@ -118,7 +117,7 @@ echo $modifiedDir
                            docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${kubectlDeploymentFileName}
                         '''*/
 
-                        sh '''
+                        sh '''#!/bin/bash
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
