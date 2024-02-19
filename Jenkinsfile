@@ -93,7 +93,7 @@ pipeline {
                            mkdir -p /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            cp ./deployment.yaml /tmp/${tmpFolder}/${kubectlDeploymentFileName}
                            docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${kubectlDeploymentFileName}
-                        '''
+                        '''*/
 
                         sh '''
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
@@ -103,9 +103,9 @@ pipeline {
                             cd /tmp
                             pwd
                             ls
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/jenkins_home:/var/jenkins_home ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} apply -f /var/jenkins_home/workspace/merce-ui-react_build_and_jenkins/${kubectlDeploymentFileName}
                             fi
-                        '''*/
+                        '''
 
 
 
