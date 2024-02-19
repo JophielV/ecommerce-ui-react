@@ -56,14 +56,14 @@ pipeline {
                 }
             }
         }
-        /*stage("Docker") {
+        stage("Docker") {
             steps {
                 unstash 'scm'
                 script {
                     sh "echo ${dockerRepoName}:$BUILD_NUMBER"
 
-                    dockerImage = docker.build("${dockerRepoName}:${majorVersion}.$BUILD_NUMBER", "-f ${dockerFile} .")
                     if (params.deployEnv == "${stagingEnv}") {
+                        dockerImage = docker.build("${dockerRepoName}:${majorVersion}.$BUILD_NUMBER", "-f ${dockerFile} .")
                         docker.withRegistry("${dockerRegistry}", dockerCredential) {
                             dockerImage.push()
                         }
@@ -77,7 +77,7 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
         stage("Kubernetes") {
             steps {
                 script {
@@ -100,7 +100,7 @@ pipeline {
                 }
             }
         }
-        /*stage("Post - Cleanup") {
+        stage("Post - Cleanup") {
             steps {
                 script {
                     sh "docker rmi ${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
@@ -114,6 +114,6 @@ pipeline {
                     sh "yes | docker image prune"
                 }
             }
-        }*/
+        }
     }
 }
