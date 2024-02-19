@@ -85,55 +85,19 @@ pipeline {
                         sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
                     } else if(params.deployEnv == "${localEnv}") {
                         sh "docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} config use-context minikube"
-                        sh "pwd"
-                        sh "ls"
-                        sh "readlink -f ${kubectlDeploymentFileName}"
-                        sh "whoami"
-
-                        /*sh '''#!/bin/bash
-                            echo "Performing command"
-                            currDirectory=$(pwd)
-                            size=${#currDirectory}
-                            currDir=$(cut -c6-$size <<< $(pwd))
-                            modifiedDir=/var/lib/docker/volumes/$currDir
-                            echo $modifiedDir
-                        '''*/
-
-                        /*sh '''
-currDirectory=$(pwd)
-size=${#currDirectory}
-
-awk \'
-BEGIN {
-currDir=substr(currDirectory, $size) 
-modifiedDir=/var/lib/docker/volumes/$currDir
-}\'
-echo $modifiedDir
-                        '''*/
-
-                        /*sh '''
-                           mkdir -p /tmp/${tmpFolder}/${kubectlDeploymentFileName}
-                           cp ./deployment.yaml /tmp/${tmpFolder}/${kubectlDeploymentFileName}
-                           docker cp jenkins:/tmp/${tmpFolder}/${kubectlDeploymentFileName} /tmp/${kubectlDeploymentFileName}
-                        '''*/
-
                         sh '''#!/bin/bash
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
                             else
                             echo "Performing command"
-                            currDirectory=$(pwd)
-                            size=${#currDirectory}
-                            echo $size
-                            echo /var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))
+                            currDir=$(pwd)
+                            size=${#currDir}
+                            contextDir=/var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))
                             
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v /var/lib/docker/volumes/jenkins_home/_data/$(cut -c19-$size <<< $(pwd))/deployment.yaml:/deployment.yaml ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $(contextDir)/${kubectlDeploymentFileName}:/${kubectlDeploymentFileName} ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
                             fi
                         '''
-
-
-
                     }
                 }
             }
