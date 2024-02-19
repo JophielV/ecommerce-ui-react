@@ -70,10 +70,8 @@ pipeline {
                     }
 
                     dockerImageLatest = docker.build("${dockerRepoName}:latest", "-f ${dockerFile} .")
-                    if (params.deployEnv == "${stagingEnv}") {
-                        docker.withRegistry("${dockerRegistry}", dockerCredential) {
-                            dockerImageLatest.push()
-                        }
+                    docker.withRegistry("${dockerRegistry}", dockerCredential) {
+                        dockerImageLatest.push()
                     }
                 }
             }

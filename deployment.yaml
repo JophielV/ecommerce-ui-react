@@ -31,3 +31,4 @@ spec:
       containers:
         - name: ecommerce-ui-kb
           image: jophielv/ecommerce-ui-prod-kub
+          imagePullPolicy: Always
