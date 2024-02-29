@@ -24,7 +24,7 @@ pipeline {
         def minikubeCaCrtPath = "/home/joph/.minikube/ca.crt"
 
         def helmDeploymentName = "ecommerce-ui"
-        def helmRepoDeploymentName = "eecommerce/ecommerce-ui"
+        def helmRepoDeploymentName = "ecommerce/ecommerce-ui"
         def helmValuesFileName = "values.yml"
 
         def localEnv = "local"
