@@ -84,6 +84,17 @@ pipeline {
             }
         }
         stage("Kubernetes") {
+            agent {
+                kubernetes {
+                    containerTemplate {
+                        name 'helm'
+                        image 'lachlanevenson/k8s-helm:v3.1.1'
+                        ttyEnabled true
+                        command 'cat'
+                    }
+                }
+            }
+
             steps {
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
@@ -110,8 +121,8 @@ pipeline {
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker rmi ${dockerRepoName}:latest"
-                        sh "docker rmi ${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
-                        sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${majorVersion}.$BUILD_NUMBER"
+                        sh "docker rmi ${dockerRepoName}:${buildName}"
+                        sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${buildName}"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
                     }
 
