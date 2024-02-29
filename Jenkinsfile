@@ -83,18 +83,16 @@ pipeline {
                 }
             }
         }
-        stage("Kubernetes") {
-            agent {
-                kubernetes {
-                    containerTemplate {
-                        name 'helm'
-                        image 'lachlanevenson/k8s-helm:v3.1.1'
-                        ttyEnabled true
-                        command 'cat'
-                    }
-                }
+        stage("Install helm"){
+            steps{
+                sh 'wget https://get.helm.sh/helm-v3.6.1-linux-amd64.tar.gz'
+                sh 'ls -a'
+                sh 'tar -xvzf helm-v3.6.1-linux-amd64.tar.gz'
+                sh 'sudo cp linux-amd64/helm /usr/bin'
+                sh 'helm version'
             }
-
+        }
+        stage("Kubernetes") {
             steps {
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
