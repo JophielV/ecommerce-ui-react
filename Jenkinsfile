@@ -16,15 +16,21 @@ pipeline {
         def dockerRegistryNoProto = "registry.hub.docker.com"
         def dockerKubectlAws = "jophielv/kubectl-aws"
 
-        def awsEksEcommerceDeployment = "ecommerce-ui-deployment"
+        def awsEksEcommerceDeployment = "ecommerce-ui"
         def kubectlConfigPath = "/home/joph/.kube/config"
         def kubectlDeploymentFileName = "deployment.yaml"
         def minikubeClientCrtPath = "/home/joph/.minikube/profiles/minikube/client.crt"
         def minikubeClientKeyPath = "/home/joph/.minikube/profiles/minikube/client.key"
         def minikubeCaCrtPath = "/home/joph/.minikube/ca.crt"
 
+        def helmDeploymentName = "ecommerce-ui"
+        def helmRepoDeploymentName = "eecommerce/ecommerce-ui"
+        def helmValuesFileName = "values.yml"
+
         def localEnv = "local"
         def stagingEnv = "staging"
+
+        def buildName = ""
 
         def tmpFolder = "test_$BUILD_NUMBER"
     }
@@ -60,18 +66,19 @@ pipeline {
             steps {
                 unstash 'scm'
                 script {
-                    sh "echo ${dockerRepoName}:$BUILD_NUMBER"
+                    buildName = "${env.BRANCH_NAME}.${env.GIT_COMMIT.take(7)}"
+                    sh "echo ${buildName}"
 
-                    if (params.deployEnv == "${stagingEnv}") {
-                        dockerImage = docker.build("${dockerRepoName}:${majorVersion}.$BUILD_NUMBER", "-f ${dockerFile} .")
-                        docker.withRegistry("${dockerRegistry}", dockerCredential) {
-                            dockerImage.push()
-                        }
+                    dockerImage = docker.build("${dockerRepoName}:${buildName}", "-f ${dockerFile} .")
+                    docker.withRegistry("${dockerRegistry}", dockerCredential) {
+                        dockerImage.push()
                     }
 
                     dockerImageLatest = docker.build("${dockerRepoName}:latest", "-f ${dockerFile} .")
-                    docker.withRegistry("${dockerRegistry}", dockerCredential) {
-                        dockerImageLatest.push()
+                    if (params.deployEnv == "${stagingEnv}") {
+                        docker.withRegistry("${dockerRegistry}", dockerCredential) {
+                            dockerImageLatest.push()
+                        }
                     }
                 }
             }
@@ -86,12 +93,12 @@ pipeline {
                         sh '''#!/bin/bash
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}
+                            helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName}
                             else
                             currDir=$(pwd)
                             size=${#currDir}
                             contextHostDirPrefix=/var/lib/docker/volumes/jenkins_home/_data
-                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} -v $contextHostDirPrefix/$(cut -c19-$size <<< $(pwd))/${kubectlDeploymentFileName}:/${kubectlDeploymentFileName} ${dockerKubectlAws} apply -f ${kubectlDeploymentFileName}
+                            helm install ${helmDeploymentName} --values ./helm/${helmValuesFileName} ${helmRepoDeploymentName}
                             fi
                         '''
                     }

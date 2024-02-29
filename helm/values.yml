@@ -1,0 +1,4 @@
+image:
+  repository: jophielv/ecommerce-ui-prod-kub
+  tag: helm1.1
+  pullPolicy: IfNotPresent
