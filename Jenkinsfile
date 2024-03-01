@@ -110,13 +110,10 @@ pipeline {
         stage("Post - Cleanup") {
             steps {
                 script {
-                    if (params.deployEnv == "${stagingEnv}") {
-                        sh "docker rmi ${dockerRepoName}:latest"
-                        sh "docker rmi ${dockerRepoName}:${buildName}"
-                        sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${buildName}"
-                        sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
-                    }
-
+                    sh "docker rmi ${dockerRepoName}:latest"
+                    sh "docker rmi ${dockerRepoName}:${buildName}"
+                    sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${buildName}"
+                    sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
                     sh "yes | docker image prune"
                 }
             }
