@@ -96,9 +96,8 @@ pipeline {
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
-                            echo helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
                             else
-                            helm install ${helmDeploymentName} --values ./helm/${helmValuesFileName} ${helmRepoDeploymentName}
+                            helm install ${helmDeploymentName} --values ./helm/${helmValuesFileName} ${helmRepoDeploymentName} --set image.tag=${buildName} --kubeconfig /.kube/config
                             fi
                         '''
                     }
