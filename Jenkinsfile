@@ -30,7 +30,7 @@ pipeline {
         def localEnv = "local"
         def stagingEnv = "staging"
 
-        def buildName = ""
+        def buildName = "${env.BRANCH_NAME}.${env.GIT_COMMIT.take(7)}"
 
         def tmpFolder = "test_$BUILD_NUMBER"
     }
@@ -66,7 +66,6 @@ pipeline {
             steps {
                 unstash 'scm'
                 script {
-                    buildName = "${env.BRANCH_NAME}.${env.GIT_COMMIT.take(7)}"
                     sh "echo ${buildName}"
 
                     dockerImage = docker.build("${dockerRepoName}:${buildName}", "-f ${dockerFile} .")
@@ -114,7 +113,7 @@ pipeline {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker rmi ${dockerRepoName}:latest"
                         sh "docker rmi ${dockerRepoName}:${buildName}"
-                        echo sh "docker rmi ${dockerRepoName}:${buildName}"
+                        echo "docker rmi ${dockerRepoName}:${buildName}"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${buildName}"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
                     }
