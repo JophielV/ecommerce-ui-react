@@ -33,12 +33,20 @@ pipeline {
         def stagingEnv = "staging"
 
         def buildName = "${env.BRANCH_NAME}.${env.GIT_COMMIT.take(7)}"
+
+        KUBECTL_CONTEXT_NAME = "${params.kubectlContextName}"
+        AWS_ACCESS_KEY_ID = "${env.AWS_ACCESS_KEY_ID}"
+        AWS_SECRET_ACCESS_KEY = "${env.AWS_SECRET_ACCESS_KEY}"
+        AWS_DEFAULT_REGION = "${env.AWS_DEFAULT_REGION}"
     }
 
     parameters {
         choice(choices:["local", "staging"],
                 description: "Which environment to deploy?",
                 name: "deployEnv")
+        string(defaultValue: "test",
+                description: "For staging - Enter the AWS cluster config name",
+                name: "kubectlContextName")
     }
 
 
@@ -86,7 +94,18 @@ pipeline {
             steps {
                 script {
                     if (params.deployEnv == "${stagingEnv}") {
-                        sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
+                        sh '''#!/bin/bash
+                            docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID="\${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="\${AWS_SECRET_ACCESS_KEY}" -e AWS_DEFAULT_REGION="\${AWS_DEFAULT_REGION}" ${dockerKubectlAws} config use-context "\${KUBECTL_CONTEXT_NAME}"
+                            
+                            echo deploying app
+                            # app deployment
+                            if docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID="\${AWS_ACCESS_KEY_ID}" -e AWS_SECRET_ACCESS_KEY="\${AWS_SECRET_ACCESS_KEY}" -e AWS_DEFAULT_REGION="\${AWS_DEFAULT_REGION}" ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
+                            then
+                            helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
+                            else
+                            helm install ${helmDeploymentName} --values ./helm/${helmValuesFileName} ${helmRepoDeploymentName} --set image.tag=${buildName} --kubeconfig /.kube/config
+                            fi
+                        '''
                     } else if(params.deployEnv == "${localEnv}") {
                         sh '''#!/bin/bash
                             docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} config use-context minikube
