@@ -96,6 +96,7 @@ pipeline {
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
+                            echo helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
                             else
                             currDir=$(pwd)
                             size=${#currDir}
@@ -113,6 +114,7 @@ pipeline {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker rmi ${dockerRepoName}:latest"
                         sh "docker rmi ${dockerRepoName}:${buildName}"
+                        echo sh "docker rmi ${dockerRepoName}:${buildName}"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:${buildName}"
                         sh "docker rmi ${dockerRegistryNoProto}/${dockerRepoName}:latest"
                     }
