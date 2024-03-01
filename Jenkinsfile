@@ -83,17 +83,6 @@ pipeline {
                 }
             }
         }
-        stage("Install helm"){
-            steps {
-                sh '''#!/bin/bash
-                wget https://get.helm.sh/helm-v3.6.1-linux-amd64.tar.gz
-                ls -a
-                tar -xvzf helm-v3.6.1-linux-amd64.tar.gz
-                cp linux-amd64/helm /usr/bin
-                helm version
-                '''
-            }
-        }
         stage("Kubernetes") {
             steps {
                 script {
