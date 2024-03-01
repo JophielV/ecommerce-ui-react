@@ -23,6 +23,8 @@ pipeline {
         def minikubeClientKeyPath = "/home/joph/.minikube/profiles/minikube/client.key"
         def minikubeCaCrtPath = "/home/joph/.minikube/ca.crt"
 
+        def helmRegistry = "https://jophielv.github.io/ecommerce-helm-charts/"
+        def helmLocalRepoName = "ecommerce"
         def helmDeploymentName = "ecommerce-ui"
         def helmRepoDeploymentName = "ecommerce/ecommerce-ui"
         def helmValuesFileName = "values.yml"
@@ -31,8 +33,6 @@ pipeline {
         def stagingEnv = "staging"
 
         def buildName = "${env.BRANCH_NAME}.${env.GIT_COMMIT.take(7)}"
-
-        def tmpFolder = "test_$BUILD_NUMBER"
     }
 
     parameters {
@@ -88,18 +88,16 @@ pipeline {
                     if (params.deployEnv == "${stagingEnv}") {
                         sh "docker run -u root --rm --name kubectl -v ${kubectlConfigPath}:/.kube/config -e AWS_ACCESS_KEY_ID='${env.AWS_ACCESS_KEY_ID}' -e AWS_SECRET_ACCESS_KEY='${env.AWS_SECRET_ACCESS_KEY}' -e AWS_DEFAULT_REGION='${env.AWS_DEFAULT_REGION}' ${dockerKubectlAws} rollout restart deployment ${awsEksEcommerceDeployment}"
                     } else if(params.deployEnv == "${localEnv}") {
-                        sh "docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} config use-context minikube"
                         sh '''#!/bin/bash
-                            helm repo add ecommerce https://jophielv.github.io/ecommerce-helm-charts/
-                            helm repo update ecommerce
+                            docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} config use-context minikube"
+                            helm repo add ecommerce ${helmRegistry}
+                            helm repo update ${helmLocalRepoName}
+
                             if docker run --rm --name kubectl -u root --net=host -v ${kubectlConfigPath}:/.kube/config -v ${minikubeClientCrtPath}:${minikubeClientCrtPath} -v ${minikubeClientKeyPath}:${minikubeClientKeyPath} -v ${minikubeCaCrtPath}:${minikubeCaCrtPath} ${dockerKubectlAws} get deploy | grep ${awsEksEcommerceDeployment}
                             then
                             helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
                             echo helm upgrade ${helmDeploymentName} ${helmRepoDeploymentName} --values ./helm/${helmValuesFileName} --set image.tag=${buildName} --kubeconfig /.kube/config
                             else
-                            currDir=$(pwd)
-                            size=${#currDir}
-                            contextHostDirPrefix=/var/lib/docker/volumes/jenkins_home/_data
                             helm install ${helmDeploymentName} --values ./helm/${helmValuesFileName} ${helmRepoDeploymentName}
                             fi
                         '''
