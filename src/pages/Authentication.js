@@ -53,7 +53,21 @@ export async function action({ request }) {
     const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1);
     localStorage.setItem('expiration', expiration.toISOString());
+
+    /*const response2 = await fetch(API_PREFIX + `/api/v1/ecommerce/user/test`, {
+      method: 'GET',
+      credentials: 'same-origin'
+    });
+
+    console.log(response2);*/
   } else {
+    const x = JSON.stringify({
+      username: data.get('email'),
+      password: data.get('password'),
+      role: data.get('role')
+    });
+    console.log(x);
+
     const response = await fetch(API_PREFIX + `/api/v1/ecommerce/auth`, {
       method: 'POST',
       headers: {
@@ -62,7 +76,8 @@ export async function action({ request }) {
       },
       body: JSON.stringify({
         username: data.get('email'),
-        password: data.get('password')
+        password: data.get('password'),
+        role: data.get('role')
       })
     });
 
